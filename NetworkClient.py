@@ -1,6 +1,6 @@
 import pickle
 import socket
-from network.network_constants import HEADER, PORT, FORMAT, SERVER, ADDRESS_SERVER, make_header, DISCONNECT_MESSAGE
+from network_constants import HEADER, PORT, FORMAT, SERVER, ADDRESS_SERVER, make_header, DISCONNECT_MESSAGE
 
 
 class NetworkClient:

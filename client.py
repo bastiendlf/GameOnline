@@ -1,5 +1,5 @@
-from network.network_constants import DISCONNECT_MESSAGE
-from network.NetworkClient import NetworkClient
+from network_constants import DISCONNECT_MESSAGE
+from NetworkClient import NetworkClient
 
 
 client = NetworkClient()

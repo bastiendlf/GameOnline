@@ -1,7 +1,7 @@
 import socket
 import threading
 import pickle
-from network.network_constants import SERVER, ADDRESS_SERVER, HEADER, DISCONNECT_MESSAGE, FORMAT, make_header
+from network_constants import SERVER, ADDRESS_SERVER, HEADER, DISCONNECT_MESSAGE, FORMAT, make_header
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
