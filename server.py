@@ -11,6 +11,10 @@ except socket.error as e:
     print("[SERVER] Server could not start")
     quit()
 
+connected = set()
+games = {}
+idCount = 0
+
 
 def handle_client(conn, address):
     conn.send(pickle.dumps(f"Welcome to server {ADDRESS_SERVER[0]}"))
@@ -35,6 +39,11 @@ def handle_client(conn, address):
             conn.send(answer)
 
     conn.close()
+
+
+def threaded_client(conn, player_number, gameID):
+    # TODO implement function
+    pass
 
 
 def start():
