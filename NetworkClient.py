@@ -1,28 +1,28 @@
 import pickle
 import socket
-from network_constants import HEADER, PORT, FORMAT, SERVER, ADDRESS_SERVER, make_header, DISCONNECT_MESSAGE
+from network_constants import HEADER, PORT, FORMAT, SERVER_IP, ADDRESS_SERVER, make_header, DISCONNECT_MESSAGE
 
 
 class NetworkClient:
-    def __init__(self):
+    def __init__(self, username: str):
+        self.username = username
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = SERVER
+        self.server = SERVER_IP
         self.port = PORT
         self.address_server = ADDRESS_SERVER
-        self.player = self.connect()
-        print(self.player)
+        self.id_client = self.connect()
 
     def connect(self):
         try:
             self.client.connect(self.address_server)
-            return pickle.loads(self.client.recv(2048))
+            player_id = int(self.client.recv(8).decode(FORMAT))
+            print(f"Player ID {player_id}")
+            self.client.send(str.encode(self.username))
+            return player_id
         except OSError as msg:
             print(msg)
             self.client.close()
             self.client = None
-
-    def get_player(self):
-        return self.player
 
     def disconnect(self):
         self.client.close()

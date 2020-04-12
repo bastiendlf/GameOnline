@@ -2,7 +2,7 @@ from network_constants import DISCONNECT_MESSAGE
 from NetworkClient import NetworkClient
 
 
-client = NetworkClient()
+client = NetworkClient("Bastien")
 
 print(client.send("hello from ME "))
 input()

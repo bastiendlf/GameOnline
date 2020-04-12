@@ -3,22 +3,29 @@ from game_data import *
 
 
 class Ship(pygame.sprite.Sprite):
-    def __init__(self, Game, x: int = 0, y: int = 0):
+    def __init__(self, username: str, x: int = 0, y: int = 0):
+        """
+        Creates a ship for rocket.io game. One rocket = 1 player
+        :param username: string
+        :param x: int
+        :param y: int
+        """
 
         super().__init__()
 
+        self.username = username
+
         # Display settings
-        self.game = Game
-        self.screen = self.game.screen
-        self.screenWidth, self.screenHeight = self.screen.get_rect().size
+        self.screenWidth = SCREEN_WIDTH
+        self.screenHeight = SCREEN_HEIGHT
         self.image = images["ship"]
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
         # Position settings
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = x if x < self.screenWidth + self.width else 0
+        self.rect.y = y if y < self.screenHeight + self.height else 0
 
         # Movement settings
         self.velocity = 5
