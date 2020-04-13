@@ -18,7 +18,7 @@ class Ship(pygame.sprite.Sprite):
         # Display settings
         self.screenWidth = SCREEN_WIDTH
         self.screenHeight = SCREEN_HEIGHT
-        self.image = images["ship"]
+        self.image = pygame.image.load("assets/images/rocket.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
         self.height = self.image.get_height()

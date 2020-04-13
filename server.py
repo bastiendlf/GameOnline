@@ -3,7 +3,6 @@ import threading
 import pickle
 from network_constants import SERVER_IP, ADDRESS_SERVER, HEADER, DISCONNECT_MESSAGE, FORMAT, make_header, \
     send_data_pickle, receive_data_pickle
-from ship import Ship
 from lobby import Lobby
 
 
@@ -48,13 +47,12 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
 
     send_data_pickle(conn, (current_id, _lobbyID))
     username = str(receive_data_pickle(conn))
-    # username = conn.recv(16).decode(FORMAT)
 
     print(f"[LOG] {str(address[0])} connected, username {username}")
 
     connected = True
     while connected:
-        pass
+        connected = False
     # When user disconnects
     print("[DISCONNECT] Name:", username, ", Client Id:", current_id, "disconnected")
     connections -= 1

@@ -1,5 +1,4 @@
 import os
-
 from game_data import *
 from ship import Ship
 
@@ -9,9 +8,21 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'  # make game window appears in the middle
 GAME_WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Rocket Bastien")
 
+# images
+bg = pygame.image.load("assets/images/bg.png").convert_alpha()
+bg = pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+# font
+font = {"bradbunr": "assets/font/BradBunR.ttf"}
+
+NAME_FONT = pygame.font.Font(font["bradbunr"], 20)
+SCORE_FONT = pygame.font.Font(font["bradbunr"], 26)
+TITLE_FONT = pygame.font.Font(font["bradbunr"], 30)
+
 
 def redraw_window(screen: pygame.Surface, players: pygame.sprite.Group):
-    screen.blit(images["bg"], (0, 0))
+    screen.blit(bg, (0, 0))
     players.draw(screen)
     pygame.display.flip()
 
