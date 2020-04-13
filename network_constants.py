@@ -1,7 +1,7 @@
 import socket
 import pickle
 
-SERVER_IP = "192.168.1.22"
+SERVER_IP = "192.168.1.18"
 PORT = 5050
 HEADER = 128
 FORMAT = 'utf-8'
