@@ -1,5 +1,5 @@
-import socket
 import pickle
+import socket
 
 SERVER_IP = "192.168.1.18"
 PORT = 5050
@@ -7,6 +7,7 @@ HEADER = 128
 FORMAT = 'utf-8'
 ADDRESS_SERVER = (SERVER_IP, PORT)
 DISCONNECT_MESSAGE = "!DISCONNECT"
+GET_PLAYERS = "GET_PLAYERS"
 
 
 def make_header(message: bytes):

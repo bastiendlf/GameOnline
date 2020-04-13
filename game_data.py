@@ -1,8 +1,23 @@
-import pygame
+import contextlib
+
+with contextlib.redirect_stdout(None):
+    import pygame
 
 # constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
+
+PLAYER_SIZE = (64, 64)
+
+BACKGROUND = pygame.transform.scale(pygame.image.load("assets/images/bg.png"), (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# font
+pygame.font.init()
+font = {"bradbunr": "assets/font/BradBunR.ttf"}
+
+NAME_FONT = pygame.font.Font(font["bradbunr"], 20)
+SCORE_FONT = pygame.font.Font(font["bradbunr"], 26)
+TITLE_FONT = pygame.font.Font(font["bradbunr"], 30)
 
 
 def createTextObj(text: str, font_object: pygame.font.Font, color=(255, 255, 255)):

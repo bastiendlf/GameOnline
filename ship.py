@@ -1,4 +1,3 @@
-import pygame
 from game_data import *
 
 
@@ -18,7 +17,7 @@ class Ship(pygame.sprite.Sprite):
         # Display settings
         self.screenWidth = SCREEN_WIDTH
         self.screenHeight = SCREEN_HEIGHT
-        self.image = pygame.image.load("assets/images/rocket.png")
+        self.image = pygame.transform.scale(pygame.image.load("assets/images/rocket.png"), PLAYER_SIZE)
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -33,14 +32,14 @@ class Ship(pygame.sprite.Sprite):
     def move(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT] and self.rect.x > 0:
+        if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and self.rect.x > 0:
             self.rect.x -= self.velocity
 
-        if keys[pygame.K_RIGHT] and self.rect.x + self.width < self.screenWidth:
+        if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and self.rect.x + self.width < self.screenWidth:
             self.rect.x += self.velocity
 
-        if keys[pygame.K_UP] and self.rect.y > 0:
+        if (keys[pygame.K_UP] or keys[pygame.K_w]) and self.rect.y > 0:
             self.rect.y -= self.velocity
 
-        if keys[pygame.K_DOWN] and self.rect.y + self.height < self.screenHeight:
+        if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and self.rect.y + self.height < self.screenHeight:
             self.rect.y += self.velocity
