@@ -4,6 +4,7 @@ import pickle
 from network_constants import SERVER_IP, ADDRESS_SERVER, HEADER, DISCONNECT_MESSAGE, FORMAT, make_header, \
     send_data_pickle, receive_data_pickle
 from lobby import Lobby
+from ship import Ship
 
 
 def handle_client(conn: socket, address: tuple):  # old
@@ -41,18 +42,24 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
     :param _clientID: client id (int)
     :return: None
     """
-    global connections, lobby, connections
+    global connections, lobbies, connections
 
     current_id = _clientID
+    lobby = lobbies[_lobbyID]
 
     send_data_pickle(conn, (current_id, _lobbyID))
     username = str(receive_data_pickle(conn))
 
     print(f"[LOG] {str(address[0])} connected, username {username}")
 
+    lobby.add_player(Ship(username))
+
     connected = True
     while connected:
-        connected = False
+        if lobby.start:
+            pass
+
+
     # When user disconnects
     print("[DISCONNECT] Name:", username, ", Client Id:", current_id, "disconnected")
     connections -= 1
@@ -62,14 +69,14 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
 def start():
     server.listen()
     print(f"[LISTENING] Server is listening on {SERVER_IP}")
-    global _idCount, lobby, connections
+    global _idCount, lobbies, connections
 
     while True:
         conn, address = server.accept()  # wait for a new client to connect
 
         lobbyID = (_idCount - 1) // 2
         if _idCount % 2 == 1:  # create a new lobby every 2 players
-            lobby[lobbyID] = Lobby(lobbyID)
+            lobbies[lobbyID] = Lobby(lobbyID)
 
         connections += 1
 
@@ -85,7 +92,7 @@ def start():
 if __name__ == "__main__":
 
     connections = 0
-    lobby = {}
+    lobbies = {}
     _idCount = 1
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

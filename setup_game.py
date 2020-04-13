@@ -7,6 +7,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'  # make game window appears in the middle
 
 GAME_WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Rocket Bastien")
+pygame.display.set_icon(pygame.image.load("assets/images/rocket.png"))
 
 # images
 bg = pygame.image.load("assets/images/bg.png").convert_alpha()

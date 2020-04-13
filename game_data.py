@@ -4,6 +4,7 @@ import pygame
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
+
 def createTextObj(text: str, font_object: pygame.font.Font, color=(255, 255, 255)):
     """
     Creates a text object with a string and a font
