@@ -14,6 +14,10 @@ class NetworkClient:
         print(f"ID CLIENT:{self.id_client}, ID LOBBY:{self.id_lobby}")
 
     def connect(self):
+        """
+        Connect to server
+        :return: server's answer to player's username, answer should be tuple (id_client, id_lobby)
+        """
         try:
             self.client.connect(self.address_server)
             return self.send(self.username)

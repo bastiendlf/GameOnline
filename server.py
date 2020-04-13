@@ -42,13 +42,13 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
     :param _clientID: client id (int)
     :return: None
     """
-    global connections, lobbies, connections
+    global connections, lobbies
 
     current_id = _clientID
     lobby = lobbies[_lobbyID]
 
-    send_data_pickle(conn, (current_id, _lobbyID))
     username = str(receive_data_pickle(conn))
+    send_data_pickle(conn, (current_id, _lobbyID))
 
     print(f"[LOG] {str(address[0])} connected, username {username}")
 
@@ -56,12 +56,18 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
 
     connected = True
     while connected:
-        if lobby.start:
-            pass
 
+        data = receive_data_pickle(conn)
+        if data == DISCONNECT_MESSAGE:
+            connected = False
+
+        print(f"[{username} ({str(address[0])})] -> {str(data)}")
+        print(f"[SERVER] Reply to {username} ({str(address[0])}) -> Message received : {str(data)}")
+
+        send_data_pickle(conn, f"Message received : {str(data)}")
 
     # When user disconnects
-    print("[DISCONNECT] Name:", username, ", Client Id:", current_id, "disconnected")
+    print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected")
     connections -= 1
     conn.close()
 
