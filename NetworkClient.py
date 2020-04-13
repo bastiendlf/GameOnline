@@ -10,15 +10,18 @@ class NetworkClient:
         self.server = SERVER_IP
         self.port = PORT
         self.address_server = ADDRESS_SERVER
-        self.id_client = self.connect()
+        self.id_client, self.id_lobby = self.connect()
+        print(f"ID CLIENT:{self.id_client}, ID LOBBY:{self.id_lobby}")
 
     def connect(self):
         try:
             self.client.connect(self.address_server)
-            player_id = int(self.client.recv(8).decode(FORMAT))
-            print(f"Player ID {player_id}")
-            self.client.send(str.encode(self.username))
-            return player_id
+            return self.send(self.username)
+
+            # player_id = int(self.client.recv(8).decode(FORMAT))
+            # print(f"Player ID {player_id}")
+            # self.client.send(str.encode(self.username))
+            # return player_id
         except OSError as msg:
             print(msg)
             self.client.close()
@@ -31,7 +34,7 @@ class NetworkClient:
         """
         Send object to server. First it sends the size of object turned into pickle and then the pickled object
         WARNING size must be a number that can be coded with 64 bits
-        :param data: python object to send to server
+        :param data: object to send to server
         :return: response from server
         """
         try:

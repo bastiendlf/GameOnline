@@ -3,9 +3,3 @@ from NetworkClient import NetworkClient
 
 
 client = NetworkClient("Bastien")
-
-print(client.send("hello from ME "))
-input()
-print(client.send("Lille very nice"))
-input()
-print(client.send(DISCONNECT_MESSAGE))

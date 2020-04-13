@@ -1,3 +1,6 @@
+import socket
+import pickle
+
 SERVER_IP = "192.168.1.22"
 PORT = 5050
 HEADER = 128
@@ -14,3 +17,29 @@ def make_header(message: bytes):
     send_length += b' ' * (HEADER - len(send_length))
 
     return send_length
+
+
+def send_data_pickle(conn: socket, data):
+    """
+    Send data turned into pickle to conn
+    :param conn: socket
+    :param data: data to send
+    :return: None
+    """
+    data_pickle = pickle.dumps(data)
+    conn.send(make_header(data_pickle))
+    conn.sendall(data_pickle)
+
+
+def receive_data_pickle(conn: socket):
+    """
+    receive a data with header
+    :param conn: socket
+    :return: unpickle object
+    """
+    msg_length = conn.recv(HEADER).decode(FORMAT)  # get the length of the incoming msg
+    if msg_length:
+        msg_length = int(msg_length)
+        msg = conn.recv(msg_length)  # adjust the buffer size
+        message_object = pickle.loads(msg)
+        return message_object

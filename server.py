@@ -1,11 +1,13 @@
 import socket
 import threading
 import pickle
-from network_constants import SERVER_IP, ADDRESS_SERVER, HEADER, DISCONNECT_MESSAGE, FORMAT, make_header
+from network_constants import SERVER_IP, ADDRESS_SERVER, HEADER, DISCONNECT_MESSAGE, FORMAT, make_header, \
+    send_data_pickle, receive_data_pickle
 from ship import Ship
+from lobby import Lobby
 
 
-def handle_client(conn: socket, address: tuple):
+def handle_client(conn: socket, address: tuple):  # old
     conn.send(pickle.dumps(f"Welcome to server {ADDRESS_SERVER[0]}"))
 
     client_pc_name = socket.gethostbyaddr(str(address[0]))[0]
@@ -30,49 +32,63 @@ def handle_client(conn: socket, address: tuple):
     conn.close()
 
 
-def threaded_client(conn: socket, address: tuple, _clientID: int):
+def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int):
     """
     runs a new thread for each player connected to server
+
     :param conn: new client's socket object
     :param address: client's address (ip, port)
+    :param _lobbyID: lobby id (int)
     :param _clientID: client id (int)
     :return: None
     """
-    global connections, players
+    global connections, lobby, connections
 
     current_id = _clientID
 
-    conn.send(str.encode(str(current_id)))
-    username = conn.recv(16).decode(FORMAT)
+    send_data_pickle(conn, (current_id, _lobbyID))
+    username = str(receive_data_pickle(conn))
+    # username = conn.recv(16).decode(FORMAT)
 
     print(f"[LOG] {str(address[0])} connected, username {username}")
-
-    players[current_id] = Ship(username, 0, 0)
 
     connected = True
     while connected:
         pass
+    # When user disconnects
+    print("[DISCONNECT] Name:", username, ", Client Id:", current_id, "disconnected")
+    connections -= 1
+    conn.close()
 
 
 def start():
     server.listen()
     print(f"[LISTENING] Server is listening on {SERVER_IP}")
-    global _idCount
+    global _idCount, lobby, connections
 
     while True:
         conn, address = server.accept()  # wait for a new client to connect
 
-        _idCount += 1
-        print(f"[ACTIVE CONNECTIONS] {_idCount}")
-        thread = threading.Thread(target=handle_client, args=(conn, address))  # Start a new thread for each client
+        lobbyID = (_idCount - 1) // 2
+        if _idCount % 2 == 1:  # create a new lobby every 2 players
+            lobby[lobbyID] = Lobby(lobbyID)
+
+        connections += 1
+
+        print(f"[ACTIVE CONNECTIONS] {connections}")
+        # thread = threading.Thread(target=handle_client, args=(conn, address))  # Start a new thread for each client
+
+        # Start a new thread for each client
+        thread = threading.Thread(target=threaded_client, args=(conn, address, lobbyID, _idCount))
         thread.start()
+        _idCount += 1
 
 
 if __name__ == "__main__":
 
-    connections = set()
-    players = {}
-    _idCount = 0
+    connections = 0
+    lobby = {}
+    _idCount = 1
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -80,6 +96,8 @@ if __name__ == "__main__":
         server.bind(ADDRESS_SERVER)
         print(f"[STARTING] Server is starting with ip {SERVER_IP}")
         start()
+        print("[SERVER] Server offline")
+
     except socket.error as e:
         print(str(e))
         print("[SERVER_IP] Server could not start")
