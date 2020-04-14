@@ -53,6 +53,9 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
     lobby = find_lobby(current_id, username)
     lobbyID = lobby.lobbyID
 
+    for lobby in lobbies:
+        print(f"Lobby {lobby.lobbyID} active, players connected : {str(lobby.all_players)}")
+
     send_data_pickle(conn, (current_id, lobbyID))
 
     print(f"[LOG] {str(address[0])} connected, username {username}")
