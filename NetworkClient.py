@@ -24,10 +24,6 @@ class NetworkClient:
             print(f"CONNECTED TO SERVER : {self.server}")
             return self.send(self.username)
 
-            # player_id = int(self.client.recv(8).decode(FORMAT))
-            # print(f"Player ID {player_id}")
-            # self.client.send(str.encode(self.username))
-            # return player_id
         except OSError as msg:
             print(msg)
             self.client.close()

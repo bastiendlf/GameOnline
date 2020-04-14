@@ -18,36 +18,42 @@ class Lobby:
         :param _lobbyID: int
         """
         self.all_players_grp = pygame.sprite.Group()
-        self.all_players = {}
+        self.all_players = dict()
         self.lobbyID = _lobbyID
         self.start = False
 
-    def add_player(self, username: str):
+    def add_player(self, user_id: int, username: str):
         """
         Add new ship object to all_players (pygame.sprite.Group)
+        :param user_id: int
         :param username: str
         :return: None
         """
-        self.all_players_grp.add(self.create_ship(username))
+
+        new_player = self.create_ship(user_id, username)
+        self.all_players_grp.add(new_player)
+        self.all_players[str(user_id)] = new_player
+
         if len(self.all_players_grp.sprites()) == 2:
             self.start = True
 
-    def create_ship(self, username: str):
+    def create_ship(self, user_id, username: str):
         """
-        Picks a start location for a player based on other player locations.
+        Picks a random start location for a player based on other player locations.
         It will ensure it does not spawn inside another player.
         :return: ship object
         """
-        new_player = Ship(username)
+        new_player = Ship(user_id, username)
 
         while True:
             new_player.rect.x = random.randrange(0, SCREEN_WIDTH)
             new_player.rect.y = random.randrange(0, SCREEN_HEIGHT)
 
-            if not check_collision(new_player, self.all_players):
+            if not check_collision(new_player, self.all_players_grp):
                 break
 
         return new_player
 
-    def get_game_objects(self):
-        return {"players": self.all_players}
+    def delete_player(self, user_id):
+        self.all_players[str(user_id)].kill()  # remove from all groups
+        del (self.all_players[str(user_id)])  # del element in players' list

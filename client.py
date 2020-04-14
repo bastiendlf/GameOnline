@@ -1,8 +1,6 @@
-import os
-
 from NetworkClient import NetworkClient
 from game_data import *
-from network_constants import DISCONNECT_MESSAGE, GET_GAME_OBJECTS
+from network_constants import DISCONNECT_MESSAGE
 
 
 def redraw_window(screen: pygame.Surface, players: pygame.sprite.Group):
@@ -24,34 +22,13 @@ def check_collision(sprite: pygame.sprite.Sprite, group: pygame.sprite.Group):
 def main(username: str):
     client = NetworkClient(username)
 
-    run = True
-    clock = pygame.time.Clock()
-    dict_game_objects = client.send(GET_GAME_OBJECTS)
-    all_players = dict_game_objects["players"]
-
-    current_ID = client.id_client
-
-    while run:
-        clock.tick(60)
-        player = all_players[current_ID]
-
-        player.move()
-        dict_game_objects = client.send(player)
-        all_players = dict_game_objects["players"]
-
-        for event in pygame.event.get():
-            # if user hits red x button close window
-            if event.type == pygame.QUIT:
-                run = False
-
-            if event.type == pygame.KEYDOWN:
-                # if user hits a escape key close program
-                if event.key == pygame.K_ESCAPE:
-                    run = False
-
-        redraw_window(GAME_WINDOW, all_players)
-
-    client.send(DISCONNECT_MESSAGE)
+    print(client.send("coucou1"))
+    input()
+    print(client.send("je suis trop content lol"))
+    input()
+    print(client.send("dernier message"))
+    input()
+    print(client.send(DISCONNECT_MESSAGE))
     pygame.quit()
     quit()
 
@@ -65,10 +42,10 @@ if __name__ == "__main__":
             print("Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
 
     pygame.init()
-    os.environ['SDL_VIDEO_CENTERED'] = '1'  # make game window appears in the middle of the screen
-
-    GAME_WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Rocket Bastien")
-    pygame.display.set_icon(pygame.image.load("assets/images/rocket.png"))
+    # os.environ['SDL_VIDEO_CENTERED'] = '1'  # make game window appears in the middle of the screen
+    #
+    # GAME_WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    # pygame.display.set_caption("Rocket Bastien")
+    # pygame.display.set_icon(pygame.image.load("assets/images/rocket.png"))
 
     main(username=name)

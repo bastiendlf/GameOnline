@@ -2,8 +2,7 @@ import socket
 import threading
 
 from lobby import Lobby
-from network_constants import SERVER_IP, ADDRESS_SERVER, DISCONNECT_MESSAGE, send_data_pickle, receive_data_pickle, \
-    GET_GAME_OBJECTS
+from network_constants import SERVER_IP, ADDRESS_SERVER, DISCONNECT_MESSAGE, send_data_pickle, receive_data_pickle
 
 
 def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int):
@@ -26,40 +25,20 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
 
     print(f"[LOG] {str(address[0])} connected, username {username}")
 
-    lobby.add_player(username)
+    lobby.add_player(current_id, username)
+
+    print(f"[LOBBY {_lobbyID}] Starting game")
 
     while True:
-        print(f"[LOBBY {_lobbyID}] Starting game")
-        try:
-            data = receive_data_pickle(conn)
+        data = receive_data_pickle(conn)
 
-            if data is not DISCONNECT_MESSAGE:
+        print(f"[{username} ({str(address[0])})] -> {str(data)}")
+        print(f"[SERVER] Reply to {username} ({str(address[0])}) -> Message received : {str(data)}")
 
-                if data == GET_GAME_OBJECTS:
-                    reply = lobby.get_game_objects()
+        send_data_pickle(conn, f"Message received : {str(data)}")
 
-                else:
-                    lobby.all_players[current_id] = data
-                    reply = lobby.get_game_objects()
-
-                send_data_pickle(conn, reply)
-
-            elif data is DISCONNECT_MESSAGE or not data:
-                del lobby.all_players[current_id]
-                break
-
-        except Exception as exe:
-            print(exe)
-            break  # if an exception has been reached disconnect client
-
-        # data = receive_data_pickle(conn)
-        # if data == DISCONNECT_MESSAGE:
-        #     connected = False
-        #
-        # print(f"[{username} ({str(address[0])})] -> {str(data)}")
-        # print(f"[SERVER] Reply to {username} ({str(address[0])}) -> Message received : {str(data)}")
-        #
-        # send_data_pickle(conn, f"Message received : {str(data)}")
+        if data == DISCONNECT_MESSAGE:
+            break
 
     # When user disconnects
     print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected")

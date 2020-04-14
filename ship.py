@@ -2,9 +2,10 @@ from game_data import *
 
 
 class Ship(pygame.sprite.Sprite):
-    def __init__(self, username: str, x: int = 0, y: int = 0):
+    def __init__(self, _client_ID: int, username: str, x: int = 0, y: int = 0):
         """
-        Creates a ship for rocket.io game. One rocket = 1 player
+        Creates a ship for game. One ship = 1 player
+        :param _client_ID: int
         :param username: string
         :param x: int
         :param y: int
@@ -12,6 +13,7 @@ class Ship(pygame.sprite.Sprite):
 
         super().__init__()
 
+        self.client_ID = _client_ID
         self.username = username
 
         # Display settings
