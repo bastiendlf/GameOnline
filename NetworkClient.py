@@ -1,5 +1,6 @@
 import pickle
 import socket
+
 from network_constants import HEADER, PORT, FORMAT, SERVER_IP, ADDRESS_SERVER, make_header, DISCONNECT_MESSAGE
 
 
@@ -20,6 +21,7 @@ class NetworkClient:
         """
         try:
             self.client.connect(self.address_server)
+            print(f"CONNECTED TO SERVER : {self.server}")
             return self.send(self.username)
 
             # player_id = int(self.client.recv(8).decode(FORMAT))
@@ -33,6 +35,7 @@ class NetworkClient:
 
     def disconnect(self):
         self.client.close()
+        print("DISCONNECTED FROM SERVER")
 
     def send(self, data):
         """

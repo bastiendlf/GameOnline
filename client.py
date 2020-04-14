@@ -2,7 +2,7 @@ import os
 
 from NetworkClient import NetworkClient
 from game_data import *
-from network_constants import DISCONNECT_MESSAGE, GET_PLAYERS
+from network_constants import DISCONNECT_MESSAGE, GET_GAME_OBJECTS
 
 
 def redraw_window(screen: pygame.Surface, players: pygame.sprite.Group):
@@ -26,7 +26,8 @@ def main(username: str):
 
     run = True
     clock = pygame.time.Clock()
-    all_players = client.send(GET_PLAYERS)
+    dict_game_objects = client.send(GET_GAME_OBJECTS)
+    all_players = dict_game_objects["players"]
 
     current_ID = client.id_client
 
@@ -35,7 +36,8 @@ def main(username: str):
         player = all_players[current_ID]
 
         player.move()
-        all_players = client.send(player)
+        dict_game_objects = client.send(player)
+        all_players = dict_game_objects["players"]
 
         for event in pygame.event.get():
             # if user hits red x button close window

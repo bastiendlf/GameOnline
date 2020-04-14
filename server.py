@@ -3,7 +3,7 @@ import threading
 
 from lobby import Lobby
 from network_constants import SERVER_IP, ADDRESS_SERVER, DISCONNECT_MESSAGE, send_data_pickle, receive_data_pickle, \
-    GET_PLAYERS
+    GET_GAME_OBJECTS
 
 
 def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int):
@@ -35,12 +35,12 @@ def threaded_client(conn: socket, address: tuple, _lobbyID: int, _clientID: int)
 
             if data is not DISCONNECT_MESSAGE:
 
-                if data == GET_PLAYERS:
-                    reply = lobby.all_players
+                if data == GET_GAME_OBJECTS:
+                    reply = lobby.get_game_objects()
 
                 else:
                     lobby.all_players[current_id] = data
-                    reply = lobby.all_players
+                    reply = lobby.get_game_objects()
 
                 send_data_pickle(conn, reply)
 
@@ -83,7 +83,6 @@ def start():
         connections += 1
 
         print(f"[ACTIVE CONNECTIONS] {connections}")
-        # thread = threading.Thread(target=handle_client, args=(conn, address))  # Start a new thread for each client
 
         # Start a new thread for each client
         thread = threading.Thread(target=threaded_client, args=(conn, address, lobbyID, _idCount))

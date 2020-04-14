@@ -1,5 +1,4 @@
 import contextlib
-
 with contextlib.redirect_stdout(None):
     import pygame
 
@@ -18,7 +17,8 @@ class Lobby:
         Creates a lobby to play a game
         :param _lobbyID: int
         """
-        self.all_players = pygame.sprite.Group()
+        self.all_players_grp = pygame.sprite.Group()
+        self.all_players = {}
         self.lobbyID = _lobbyID
         self.start = False
 
@@ -28,8 +28,8 @@ class Lobby:
         :param username: str
         :return: None
         """
-        self.all_players.add(self.create_ship(username))
-        if len(self.all_players.sprites()) == 2:
+        self.all_players_grp.add(self.create_ship(username))
+        if len(self.all_players_grp.sprites()) == 2:
             self.start = True
 
     def create_ship(self, username: str):
@@ -48,3 +48,6 @@ class Lobby:
                 break
 
         return new_player
+
+    def get_game_objects(self):
+        return {"players": self.all_players}
