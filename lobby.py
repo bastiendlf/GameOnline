@@ -1,59 +1,42 @@
 import contextlib
+
 with contextlib.redirect_stdout(None):
-    import pygame
-
-import random
-from ship import Ship
-from game_data import SCREEN_HEIGHT, SCREEN_WIDTH
-
-
-def check_collision(sprite: pygame.sprite.Sprite, group: pygame.sprite.Group):
-    return pygame.sprite.spritecollide(sprite, group, dokill=False, collided=pygame.sprite.collide_mask)
+    pass
 
 
 class Lobby:
-    def __init__(self, _lobbyID):
+    def __init__(self, _lobbyID: int, max_players: int = 2):
         """
         Creates a lobby to play a game
         :param _lobbyID: int
+        :param max_players: int
         """
-        self.all_players_grp = pygame.sprite.Group()
-        self.all_players = dict()
         self.lobbyID = _lobbyID
+        self.max_players = max_players
+        self.all_players = dict()
         self.start = False
 
-    def add_player(self, user_id: int, username: str):
+    def add_player(self, player_id: int, username: str):
         """
-        Add new ship object to all_players (pygame.sprite.Group)
-        :param user_id: int
+        Add a new player in the lobby if lobby not full
+        :param player_id: int
         :param username: str
         :return: None
         """
+        if len(self.all_players) < self.max_players:
+            self.all_players[str(player_id)] = username
+            print(f"[LOBBY] {username} is connected in lobby number {self.lobbyID}")
 
-        new_player = self.create_ship(user_id, username)
-        self.all_players_grp.add(new_player)
-        self.all_players[str(user_id)] = new_player
+    def is_full(self):
+        return self.max_players == len(self.all_players)
 
-        if len(self.all_players_grp.sprites()) == 2:
-            self.start = True
+    def get_number_players_connected(self):
+        return len(self.all_players)
 
-    def create_ship(self, user_id, username: str):
+    def remove_player(self, playerID: int):
         """
-        Picks a random start location for a player based on other player locations.
-        It will ensure it does not spawn inside another player.
-        :return: ship object
+        Remove player from all_players dict
+        :param playerID: int
+        :return: None
         """
-        new_player = Ship(user_id, username)
-
-        while True:
-            new_player.rect.x = random.randrange(0, SCREEN_WIDTH)
-            new_player.rect.y = random.randrange(0, SCREEN_HEIGHT)
-
-            if not check_collision(new_player, self.all_players_grp):
-                break
-
-        return new_player
-
-    def delete_player(self, user_id):
-        self.all_players[str(user_id)].kill()  # remove from all groups
-        del (self.all_players[str(user_id)])  # del element in players' list
+        del (self.all_players[str(playerID)])

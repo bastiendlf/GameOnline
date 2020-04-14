@@ -1,7 +1,7 @@
 import pickle
 import socket
 
-from network_constants import HEADER, PORT, FORMAT, SERVER_IP, ADDRESS_SERVER, make_header, DISCONNECT_MESSAGE
+from network_constants import HEADER, PORT, FORMAT, SERVER_IP, ADDRESS_SERVER, make_header
 
 
 class NetworkClient:
@@ -57,6 +57,3 @@ class NetworkClient:
 
         except socket.error as e:
             print(e)
-
-        if data == DISCONNECT_MESSAGE:
-            self.disconnect()

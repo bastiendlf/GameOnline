@@ -1,13 +1,19 @@
 import pickle
 import socket
+from enum import Enum
 
 SERVER_IP = "192.168.1.18"
 PORT = 5050
 HEADER = 128
 FORMAT = 'utf-8'
 ADDRESS_SERVER = (SERVER_IP, PORT)
-DISCONNECT_MESSAGE = "!DISCONNECT"
-GET_GAME_OBJECTS = "GET_GAME_OBJECTS"
+
+MAX_PLAYERS_LOBBY = 2
+
+
+class NetworkRequests(Enum):
+    DISCONNECT = "!DISCONNECT"
+    GET = "GET"
 
 
 def make_header(message: bytes):
