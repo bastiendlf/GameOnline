@@ -1,3 +1,5 @@
+import numpy as np
+
 from NetworkClient import NetworkClient
 from game_data import *
 from network_constants import NetworkRequests
@@ -14,10 +16,7 @@ def main(username: str):
 
     print(client.send("coucou1"))
     input()
-    print(client.send("je suis trop content lol"))
-    input()
-    print(client.send("dernier message"))
-    input()
+    print(client.send(np.zeros((10, 10), dtype=int)))
     print(client.send(NetworkRequests.DISCONNECT))
     pygame.quit()
     quit()

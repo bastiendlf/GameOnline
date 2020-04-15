@@ -3,13 +3,36 @@ import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
 
+from enum import Enum
+
 # constants
-SCREEN_WIDTH = 1000
+SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
+GRID_SIZE = (10, 10)
 
-PLAYER_SIZE = (64, 64)
 
-BACKGROUND = pygame.transform.scale(pygame.image.load("assets/images/bg.png"), (SCREEN_WIDTH, SCREEN_HEIGHT))
+# Boats type
+class BoatType(Enum):
+    aircraft_carrier = 5
+    cruiser = 4
+    destroyer = 3
+    torpedo_boat = 2
+
+
+class Orientation(Enum):
+    vertical = 0
+    horizontal = 1
+
+
+class BoatCellState(Enum):
+    safe = 0
+    touched = 1
+
+
+class GridCellType(Enum):
+    water = 0
+    boat = 1
+
 
 # font
 pygame.font.init()
