@@ -28,29 +28,28 @@ class Game:
 
         if orientation == Orientation.horizontal:
             # make sure boat fits in the grid
-            if (pos_head[0] + boat_type.value - 1 <= GRID_SIZE[0] - 1) and (GRID_SIZE[0] - 1 >= pos_head[0] >= 0) and (
-                    GRID_SIZE[1] - 1 >= pos_head[1] >= 0):
-                # make sure boat does not cross another boat
-                free_space = True
-                for i in range(boat_type.value):
-                    if self.my_grid[pos_head[1]][pos_head[0] + i] != GridCellType.water:
-                        free_space = False
-                        break
-                if free_space:
-                    result = True
+            if pos_head[0] + boat_type.value - 1 <= GRID_SIZE[0] - 1:
+                if GRID_SIZE[0] - 1 >= pos_head[0] >= 0 and GRID_SIZE[1] - 1 >= pos_head[1] >= 0:
+                    # make sure boat does not cross another boat
+                    free_space = True
+                    for i in range(boat_type.value):
+                        if self.my_grid[pos_head[1]][pos_head[0] + i] != GridCellType.water:
+                            free_space = False
+                            break
+                    if free_space:
+                        result = True
 
         elif orientation == Orientation.vertical:
             # make sure boat fits in the grid
-            if (pos_head[1] + boat_type.value - 1 <= GRID_SIZE[1] - 1) and (GRID_SIZE[0] - 1 >= pos_head[0] >= 0) and (
-                    GRID_SIZE[1] - 1 >= pos_head[1] >= 0):
-                # make sure boat does not cross another boat
-                free_space = True
-                for i in range(boat_type.value):
-                    if self.my_grid[pos_head[1] + i][pos_head[0]] != GridCellType.water:
-                        free_space = False
-                        break
-                if free_space:
+            if pos_head[1] + boat_type.value - 1 <= GRID_SIZE[1] - 1:
+                if GRID_SIZE[0] - 1 >= pos_head[0] >= 0 and GRID_SIZE[1] - 1 >= pos_head[1] >= 0:
+                    # make sure boat does not cross another boat
+                    free_space = True
                     for i in range(boat_type.value):
-                        result = True
-
+                        if self.my_grid[pos_head[1] + i][pos_head[0]] != GridCellType.water:
+                            free_space = False
+                            break
+                    if free_space:
+                        for i in range(boat_type.value):
+                            result = True
         return result
