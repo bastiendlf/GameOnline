@@ -3,7 +3,7 @@ import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
 
-from enum import Enum
+from enum import Enum, IntEnum
 
 # constants
 SCREEN_WIDTH = 600
@@ -29,7 +29,7 @@ class BoatCellState(Enum):
     touched = 1
 
 
-class GridCellType(Enum):
+class GridCellType(IntEnum):
     water = 0
     boat = 1
 
