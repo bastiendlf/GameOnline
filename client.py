@@ -23,6 +23,21 @@ def main(username: str):
             startGame = True
 
     print("Start game")
+    while startGame:
+        turn = client.send((MessageType.WHOSE_TURN, ""))
+
+        if turn[0] == MessageType.END_GAME:
+            startGame = False
+            break
+        elif turn[0] == MessageType.WHOSE_TURN:
+            if turn[1] == username:  # my turn
+                print("YOUR TURN")
+                x = int(input("enter x gess (0-9):"))
+                y = int(input("enter y gess (0-9):"))
+                my_game.attack_enemy((x, y))
+                my_game.my_guessed = client.send((MessageType.SEND_MY_GUESSED, my_game.my_guessed))[1]
+            else:  # opponent's turn
+                pass
 
     client.send((MessageType.DISCONNECT,))
     pygame.quit()

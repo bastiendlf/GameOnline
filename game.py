@@ -7,7 +7,7 @@ from game_data import *
 class Game:
     def __init__(self):
         self.my_grid = np.full(GRID_SIZE, GridCellType.water.value, dtype=int)
-        self.my_guessed = np.full(GRID_SIZE, GridCellType.water, dtype=GridCellType)
+        self.my_guessed = np.full(GRID_SIZE, GridCellType.water.value, dtype=int)
 
         self.my_boats = []
 
@@ -60,3 +60,14 @@ class Game:
                         for i in range(boat_type.value):
                             result = True
         return result
+
+    def attack_enemy(self, pos: tuple):
+        if self.correct_attack_location(pos):
+            self.my_guessed[pos[1]][pos[0]] = GridCellType.guess
+
+    def correct_attack_location(self, pos: tuple):
+        res = False
+        if (0 <= pos[0] < GRID_SIZE[0]) and (0 <= pos[1] < GRID_SIZE[1]):  # in the grid
+            if self.my_guessed[pos[1]][pos[0]] == GridCellType.water:
+                res = True
+        return res

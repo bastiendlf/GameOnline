@@ -1,6 +1,9 @@
 import socket
 import threading
 
+import numpy as np
+
+from game_data import GridCellType
 from lobby import Lobby
 from network_constants import SERVER_IP, ADDRESS_SERVER, send_data_pickle, receive_data_pickle, MessageType, \
     MAX_PLAYERS_LOBBY
@@ -53,6 +56,8 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
     lobby = find_lobby(current_id, username)
     lobbyID = lobby.lobbyID
 
+    opponent = tuple()
+
     for lobby in lobbies:
         print(f"Lobby {lobby.lobbyID} active, players connected : {str(lobby.all_players)}.")
     send_data_pickle(conn, (current_id, lobbyID))
@@ -72,6 +77,13 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
                 if lobby.start:
                     send_start = True
             send_data_pickle(conn, (MessageType.START_PLAY, ""))
+            opponent = get_opponent(username, lobby)
+
+        if data[0] == MessageType.SEND_MY_GUESSED:
+            guessed = data[1]
+            print(f"[{username} sends its guessed grid")
+
+            send_data_pickle(conn, (MessageType.SEND_MY_GUESSED, guessed))
 
         if data[0] == MessageType.WHOSE_TURN:
             send_data_pickle(conn, (MessageType.WHOSE_TURN, lobby.current_turn))
@@ -107,6 +119,39 @@ def start():
         thread = threading.Thread(target=threaded_client, args=(conn, address, _idCount))
         thread.start()
         _idCount += 1
+
+
+def get_opponent(my_username: str, lobby: Lobby):
+    """
+    Get opponent info (id and username)
+    :param my_username: str my username
+    :param lobby: my lobby
+    :return: tuple (opponent id :int, opponent username: str)
+    """
+    if lobby.all_players[0][1] == my_username:
+        return lobby.all_players[1]
+    else:
+        return lobby.all_players[0]
+
+
+def check_attack_result(my_guessed: np.ndarray, opponent_grid: np.ndarray):
+    """
+    Check result of player's attack on opponent
+    :param my_guessed: numpy array
+    :param opponent_grid: numpy array
+    :return: tuple (touched :boolean, my_guessed : numpy)
+    """
+    touched = False
+
+    for i in my_guessed.shape[0]:
+        for j in my_guessed.shape[1]:
+            if my_guessed[j][i] == GridCellType.guess:
+                if opponent_grid[j][i] == GridCellType.boat:
+                    touched = True
+                    my_guessed[j][i] = GridCellType.touched
+                break
+        break
+    return touched, my_guessed
 
 
 if __name__ == "__main__":
