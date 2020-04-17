@@ -11,9 +11,12 @@ ADDRESS_SERVER = (SERVER_IP, PORT)
 MAX_PLAYERS_LOBBY = 2
 
 
-class NetworkRequests(Enum):
+class MessageType(Enum):
     DISCONNECT = "!DISCONNECT"
     GET = "GET"
+    SEND_MY_GRID = "SEND_MY_GRID"
+    REPLY_ACK = "REPLY_ACK"
+    REPLY_DISCONNECT = "REPLY_DISCONNECT"
 
 
 def make_header(message: bytes):

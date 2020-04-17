@@ -32,6 +32,9 @@ class BoatCellState(Enum):
 class GridCellType(IntEnum):
     water = 0
     boat = 1
+    guess = 2
+    touched = 3
+    missed = 4
 
 
 # font

@@ -24,6 +24,13 @@ class Game:
                     self.my_grid[pos_head[1] + i][pos_head[0]] = GridCellType.boat.value
 
     def check_correct_boat_location(self, boat_type: BoatType, pos_head: tuple, orientation: Orientation):
+        """
+        Check if the boat's location in the grid is correct
+        :param boat_type: BoatType enum
+        :param pos_head: tuple (x, y)
+        :param orientation: Orientation enum
+        :return: Boolean
+        """
         result = False
 
         if orientation == Orientation.horizontal:

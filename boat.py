@@ -34,4 +34,4 @@ class Boat:
                 self.cells.append(ShipCell((pos_head[0] + i, pos_head[1])))
 
     def __str__(self):
-        return str(self.type)
+        return f"{self.type}: Alive" if not self.is_drowned() else f"{self.type}: Drowned"

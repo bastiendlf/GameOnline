@@ -2,7 +2,7 @@ import socket
 import threading
 
 from lobby import Lobby
-from network_constants import SERVER_IP, ADDRESS_SERVER, send_data_pickle, receive_data_pickle, NetworkRequests, \
+from network_constants import SERVER_IP, ADDRESS_SERVER, send_data_pickle, receive_data_pickle, MessageType, \
     MAX_PLAYERS_LOBBY
 
 
@@ -27,7 +27,7 @@ def find_lobby(client_id: int, username: str):
 
     if not lobbyFound:
         new_id_lobby = len(lobbies)
-        print(f"[LOBBY] Creating new lobby with id {new_id_lobby}")
+        print(f"[LOBBY] Creating new lobby with id {new_id_lobby}.")
         new_lobby = Lobby(new_id_lobby, MAX_PLAYERS_LOBBY)
         new_lobby.add_player(client_id, username)
         lobbies.append(new_lobby)
@@ -49,40 +49,36 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
     connected = True
 
     username = str(receive_data_pickle(conn))
-
+    print(f"[SERVER] {str(address[0])} connected, username {username}.")
     lobby = find_lobby(current_id, username)
     lobbyID = lobby.lobbyID
 
     for lobby in lobbies:
-        print(f"Lobby {lobby.lobbyID} active, players connected : {str(lobby.all_players)}")
-
+        print(f"Lobby {lobby.lobbyID} active, players connected : {str(lobby.all_players)}.")
     send_data_pickle(conn, (current_id, lobbyID))
-
-    print(f"[LOG] {str(address[0])} connected, username {username}")
-
-    print(f"[LOBBY {lobbyID}] Starting game")
 
     while connected:
         data = receive_data_pickle(conn)
 
-        print(f"[{username} ({str(address[0])})] -> {str(data)}")
-        print(f"[SERVER] Reply to {username} ({str(address[0])}) -> Message received : {str(data)}")
+        if data[0] == MessageType.SEND_MY_GRID:
+            print(f"[LOBBY] {username} sends its grid.")
+            lobby.add_grid_player(current_id, data[1])
+            send_data_pickle(conn, (MessageType.REPLY_ACK, "[SERVER] Grid received."))
+            print(lobby.all_grids[str(current_id)])
 
-        send_data_pickle(conn, f"Message received : {str(data)}")
-
-        if data == NetworkRequests.DISCONNECT or not data:
+        if data[0] == MessageType.DISCONNECT:
             connected = False
             lobby.remove_player(current_id)
 
     # When user disconnects
-    print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected")
+    print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected.")
     connections -= 1
     conn.close()
 
 
 def start():
     server.listen()
-    print(f"[LISTENING] Server is now listening")
+    print(f"[LISTENING] Server is now listening.")
     global _idCount, lobbies, connections
 
     while True:
@@ -95,7 +91,7 @@ def start():
 
         connections += 1
 
-        print(f"[ACTIVE CONNECTIONS] {connections}")
+        print(f"[ACTIVE CONNECTIONS] {connections}.")
 
         # Start a new thread for each client
         thread = threading.Thread(target=threaded_client, args=(conn, address, _idCount))
@@ -113,11 +109,11 @@ if __name__ == "__main__":
 
     try:
         server.bind(ADDRESS_SERVER)
-        print(f"[STARTING] Server is starting with ip {SERVER_IP}")
+        print(f"[STARTING] Server is starting with ip {SERVER_IP}.")
         start()
-        print("[SERVER] Server offline")
+        print("[SERVER] Server offline.")
 
     except socket.error as e:
         print(str(e))
-        print("[SERVER_IP] Server could not start")
+        print("[SERVER_IP] Server could not start.")
         quit()

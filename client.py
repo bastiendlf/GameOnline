@@ -1,8 +1,7 @@
-import numpy as np
-
 from NetworkClient import NetworkClient
+from game import Game
 from game_data import *
-from network_constants import NetworkRequests
+from network_constants import MessageType
 
 
 def main(username: str):
@@ -12,14 +11,23 @@ def main(username: str):
     # GAME_WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     # pygame.display.set_caption("Rocket Bastien")
     # pygame.display.set_icon(pygame.image.load("assets/images/rocket.png"))
-    client = NetworkClient(username)
 
-    print(client.send("coucou1"))
-    input()
-    print(client.send(np.zeros((10, 10), dtype=int)))
-    print(client.send(NetworkRequests.DISCONNECT))
+    client = NetworkClient(username)
+    my_game = Game()
+    place_boats(my_game)
+    print(client.send((MessageType.SEND_MY_GRID, my_game.my_grid))[1])
+    client.send((MessageType.DISCONNECT,))
     pygame.quit()
     quit()
+
+
+def place_boats(game: Game):
+    game.place_one_boat(BoatType.aircraft_carrier, (1, 1), Orientation.vertical)
+    game.place_one_boat(BoatType.cruiser, (1, 9), Orientation.horizontal)
+    game.place_one_boat(BoatType.torpedo_boat, (4, 4), Orientation.vertical)
+    game.place_one_boat(BoatType.destroyer, (6, 1), Orientation.horizontal)
+    game.place_one_boat(BoatType.destroyer, (6, 8), Orientation.vertical)
+    game.place_one_boat(BoatType.destroyer, (8, 6), Orientation.vertical)
 
 
 if __name__ == "__main__":

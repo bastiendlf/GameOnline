@@ -1,7 +1,4 @@
-import contextlib
-
-with contextlib.redirect_stdout(None):
-    pass
+import numpy as np
 
 
 class Lobby:
@@ -13,8 +10,10 @@ class Lobby:
         """
         self.lobbyID = _lobbyID
         self.max_players = max_players
-        self.all_players = dict()
+        self.all_players = list()
+        self.all_grids = dict()
         self.start = False
+        self.current_turn = set()
 
     def add_player(self, player_id: int, username: str):
         """
@@ -23,9 +22,23 @@ class Lobby:
         :param username: str
         :return: None
         """
-        if len(self.all_players) < self.max_players:
-            self.all_players[str(player_id)] = username
+        if not self.is_full():
+            self.all_players.append((player_id, username))
             print(f"[LOBBY] {username} is connected in lobby number {self.lobbyID}")
+            if self.all_players.__len__() == 1:
+                self.current_turn = username
+
+    def change_turn(self):
+        if self.current_turn == self.all_players[0][1]:
+            self.current_turn = self.all_players[1][1]
+        elif self.current_turn == self.all_players[1][1]:
+            self.current_turn = self.all_players[0][1]
+        print("current turn:" + str(self.current_turn))
+
+    def add_grid_player(self, player_id: int, grid: np):
+        self.all_grids[str(player_id)] = grid
+        if self.all_players.__len__() == self.all_grids.__len__() == self.max_players:
+            self.start = True
 
     def is_full(self):
         return self.max_players == len(self.all_players)
@@ -33,10 +46,11 @@ class Lobby:
     def get_number_players_connected(self):
         return len(self.all_players)
 
-    def remove_player(self, playerID: int):
+    def remove_player(self, playerID: int, username: str):
         """
         Remove player from all_players dict
         :param playerID: int
         :return: None
         """
-        del (self.all_players[str(playerID)])
+        self.all_players.remove((playerID, username))
+        del self.all_grids[str(playerID)]
