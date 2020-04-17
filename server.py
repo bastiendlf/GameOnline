@@ -66,9 +66,19 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
             send_data_pickle(conn, (MessageType.REPLY_ACK, "[SERVER] Grid received."))
             print(lobby.all_grids[str(current_id)])
 
+            # Wait for other player
+            send_start = False
+            while not send_start:
+                if lobby.start:
+                    send_start = True
+            send_data_pickle(conn, (MessageType.START_PLAY, ""))
+
+        if data[0] == MessageType.WHOSE_TURN:
+            send_data_pickle(conn, (MessageType.WHOSE_TURN, lobby.current_turn))
+
         if data[0] == MessageType.DISCONNECT:
             connected = False
-            lobby.remove_player(current_id)
+            lobby.remove_player(current_id, username)
 
     # When user disconnects
     print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected.")

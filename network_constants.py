@@ -17,6 +17,15 @@ class MessageType(Enum):
     SEND_MY_GRID = "SEND_MY_GRID"
     REPLY_ACK = "REPLY_ACK"
     REPLY_DISCONNECT = "REPLY_DISCONNECT"
+    WHOSE_TURN = "WHOSE_TURN"
+    START_PLAY = "START_PLAY"
+
+
+class LobbyStatus(Enum):
+    WAIT_FOR_PLAYERS = "WAIT_FOR_PLAYERS"
+    WAIT_FOR_GRIDS = "WAIT_FOR_GRIDS"
+    START_PLAY = "START_PLAY"
+    WAIT_FOR_GUESS_GRID = "WAIT_FOR_GUESS_GRID"
 
 
 def make_header(message: bytes):

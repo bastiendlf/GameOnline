@@ -45,15 +45,18 @@ class NetworkClient:
             self.client.send(make_header(message))
             self.client.send(message)
 
-            answer_length = self.client.recv(HEADER).decode(FORMAT)
-            if answer_length:
-                answer = self.client.recv(int(answer_length))
-                try:
-                    answer = pickle.loads(answer)
-                except Exception as e:
-                    print(str(e))
-
-                return answer
+            return self.receive_from_server()
 
         except socket.error as e:
             print(e)
+
+    def receive_from_server(self):
+        answer_length = self.client.recv(HEADER).decode(FORMAT)
+        if answer_length:
+            answer = self.client.recv(int(answer_length))
+            try:
+                answer = pickle.loads(answer)
+            except Exception as e:
+                print(str(e))
+
+            return answer

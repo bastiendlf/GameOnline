@@ -16,6 +16,14 @@ def main(username: str):
     my_game = Game()
     place_boats(my_game)
     print(client.send((MessageType.SEND_MY_GRID, my_game.my_grid))[1])
+
+    startGame = False
+    while not startGame:
+        if client.receive_from_server()[0] == MessageType.START_PLAY:
+            startGame = True
+
+    print("Start game")
+
     client.send((MessageType.DISCONNECT,))
     pygame.quit()
     quit()
