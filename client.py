@@ -15,6 +15,7 @@ def main(username: str):
     client = NetworkClient(username)
     my_game = Game()
     place_boats(my_game)
+
     print(client.send((MessageType.SEND_MY_GRID, my_game.my_grid))[1])
 
     startGame = False
@@ -36,8 +37,14 @@ def main(username: str):
                 y = int(input("enter y gess (0-9):"))
                 my_game.attack_enemy((x, y))
                 my_game.my_guessed = client.send((MessageType.SEND_MY_GUESSED, my_game.my_guessed))[1]
+
             else:  # opponent's turn
-                pass
+                print("OPPONENT IS PLAYING, PLEASE WAIT...")
+                answer = client.send((MessageType.UPDATED_GRID, ""))
+                if answer[0] == MessageType.UPDATED_GRID:
+                    my_game.my_grid = answer[1]
+                print("YOUR GRID NOW :")
+                print(my_game.my_grid)
 
     client.send((MessageType.DISCONNECT,))
     pygame.quit()

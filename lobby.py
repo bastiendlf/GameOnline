@@ -1,6 +1,5 @@
 import numpy as np
 
-from game_data import GRID_SIZE, GridCellType
 from network_constants import LobbyStatus
 
 
@@ -15,8 +14,8 @@ class Lobby:
         self.max_players = max_players
         self.all_players = list()
         self.all_grids = dict()
-        self.all_guessed = dict()
         self.start = False
+        self.end_turn = False
         self.current_turn = set()
         self.status = LobbyStatus.WAIT_FOR_PLAYERS
 
@@ -44,12 +43,8 @@ class Lobby:
 
     def add_grid_player(self, player_id: int, grid: np.ndarray):
         self.all_grids[str(player_id)] = grid
-        self.add_guessed_grid(player_id)
         if self.all_players.__len__() == self.all_grids.__len__() == self.max_players:
             self.start = True
-
-    def add_guessed_grid(self, player_id: int):
-        self.all_guessed[str(player_id)] = np.full(GRID_SIZE, GridCellType.water.value, dtype=int)
 
     def is_full(self):
         return self.max_players == len(self.all_players)
@@ -60,6 +55,7 @@ class Lobby:
     def remove_player(self, playerID: int, username: str):
         """
         Remove player from all_players dict
+        :param username: str
         :param playerID: int
         :return: None
         """

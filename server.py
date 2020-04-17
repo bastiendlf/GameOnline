@@ -47,6 +47,7 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
     :param _clientID: client id (int)
     :return: None
     """
+
     global connections, lobbies
     current_id = _clientID
     connected = True
@@ -82,8 +83,21 @@ def threaded_client(conn: socket, address: tuple, _clientID: int):
         if data[0] == MessageType.SEND_MY_GUESSED:
             guessed = data[1]
             print(f"[{username} sends its guessed grid")
-
+            touched, guessed, lobby.all_grids[str(opponent[0])] = check_attack_result(guessed,
+                                                                                      lobby.all_grids[str(opponent[0])])
+            if not touched:
+                lobby.change_turn()
             send_data_pickle(conn, (MessageType.SEND_MY_GUESSED, guessed))
+            lobby.end_turn = True
+
+        if data[0] == MessageType.UPDATED_GRID:
+            ready = False
+            while ready:
+                if lobby.end_turn:  # wait for opponent to play
+                    ready = False
+                    break
+            lobby.end_turn = False
+            send_data_pickle(conn, (MessageType.UPDATED_GRID, lobby.all_grids[str(current_id)]))
 
         if data[0] == MessageType.WHOSE_TURN:
             send_data_pickle(conn, (MessageType.WHOSE_TURN, lobby.current_turn))
@@ -139,19 +153,20 @@ def check_attack_result(my_guessed: np.ndarray, opponent_grid: np.ndarray):
     Check result of player's attack on opponent
     :param my_guessed: numpy array
     :param opponent_grid: numpy array
-    :return: tuple (touched :boolean, my_guessed : numpy)
+    :return: touched :boolean, my_guessed : numpy, opponent_grid : numpy
     """
     touched = False
 
-    for i in my_guessed.shape[0]:
-        for j in my_guessed.shape[1]:
-            if my_guessed[j][i] == GridCellType.guess:
-                if opponent_grid[j][i] == GridCellType.boat:
+    for i in range(my_guessed.shape[0]):
+        for j in range(my_guessed.shape[1]):
+            if my_guessed[i][j] == GridCellType.guess:
+                if opponent_grid[i][j] == GridCellType.boat:
                     touched = True
-                    my_guessed[j][i] = GridCellType.touched
+                    my_guessed[i][j] = GridCellType.touched
+                    opponent_grid[i][j] = GridCellType.touched
+                    return touched, my_guessed, opponent_grid
                 break
-        break
-    return touched, my_guessed
+    return touched, my_guessed, opponent_grid
 
 
 if __name__ == "__main__":

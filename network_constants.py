@@ -21,6 +21,7 @@ class MessageType(Enum):
     WHOSE_TURN = "WHOSE_TURN"
     START_PLAY = "START_PLAY"
     END_GAME = "END_GAME"
+    UPDATED_GRID = "UPDATED_GRID"
 
 
 class LobbyStatus(Enum):
