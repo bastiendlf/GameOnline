@@ -1,23 +1,20 @@
 import numpy as np
 
-from network_constants import LobbyStatus
-
 
 class Lobby:
-    def __init__(self, _lobbyID: int, max_players: int = 2):
+    def __init__(self, _lobby_id: int, max_players: int = 2):
         """
         Creates a lobby to play a game
-        :param _lobbyID: int
+        :param _lobby_id: int
         :param max_players: int
         """
-        self.lobbyID = _lobbyID
+        self.lobbyID = _lobby_id
         self.max_players = max_players
         self.all_players = list()
         self.all_grids = dict()
         self.start = False
         self.end_turn = False
         self.current_turn = set()
-        self.status = LobbyStatus.WAIT_FOR_PLAYERS
 
     def add_player(self, player_id: int, username: str):
         """
@@ -28,18 +25,16 @@ class Lobby:
         """
         if not self.is_full():
             self.all_players.append((player_id, username))
-            print(f"[LOBBY] {username} is connected in lobby number {self.lobbyID}")
+            print(f"[LOBBY {self.lobbyID}] {username} is connected in lobby.")
             if self.all_players.__len__() == 1:
                 self.current_turn = username
-            if self.is_full():
-                self.status = LobbyStatus.WAIT_FOR_GRIDS
 
     def change_turn(self):
         if self.current_turn == self.all_players[0][1]:
             self.current_turn = self.all_players[1][1]
         elif self.current_turn == self.all_players[1][1]:
             self.current_turn = self.all_players[0][1]
-        print("Current turn:" + str(self.current_turn))
+        print(f"[LOBBY {self.lobbyID}] Current turn:" + str(self.current_turn))
 
     def add_grid_player(self, player_id: int, grid: np.ndarray):
         self.all_grids[str(player_id)] = grid
@@ -52,12 +47,12 @@ class Lobby:
     def get_number_players_connected(self):
         return len(self.all_players)
 
-    def remove_player(self, playerID: int, username: str):
+    def remove_player(self, player_id: int, username: str):
         """
         Remove player from all_players dict
         :param username: str
-        :param playerID: int
+        :param player_id: int
         :return: None
         """
-        self.all_players.remove((playerID, username))
-        del self.all_grids[str(playerID)]
+        self.all_players.remove((player_id, username))
+        del self.all_grids[str(player_id)]

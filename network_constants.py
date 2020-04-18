@@ -14,6 +14,7 @@ MAX_PLAYERS_LOBBY = 2
 class MessageType(Enum):
     DISCONNECT = "!DISCONNECT"
     GET = "GET"
+    SEND_MY_USERNAME = "SEND_MY_USERNAME"
     SEND_MY_GRID = "SEND_MY_GRID"
     SEND_MY_GUESSED = "SEND_MY_GUESSED"
     REPLY_ACK = "REPLY_ACK"
@@ -22,13 +23,6 @@ class MessageType(Enum):
     START_PLAY = "START_PLAY"
     END_GAME = "END_GAME"
     UPDATED_GRID = "UPDATED_GRID"
-
-
-class LobbyStatus(Enum):
-    WAIT_FOR_PLAYERS = "WAIT_FOR_PLAYERS"
-    WAIT_FOR_GRIDS = "WAIT_FOR_GRIDS"
-    START_PLAY = "START_PLAY"
-    WAIT_FOR_GUESS_GRID = "WAIT_FOR_GUESS_GRID"
 
 
 def make_header(message: bytes):
@@ -41,11 +35,11 @@ def make_header(message: bytes):
     return send_length
 
 
-def send_data_pickle(conn: socket, data):
+def send_data_pickle(conn: socket, data: tuple):
     """
     Send data turned into pickle to conn
     :param conn: socket
-    :param data: data to send
+    :param data: data to send (MessageType Enum, DATA)
     :return: None
     """
     data_pickle = pickle.dumps(data)
@@ -57,7 +51,7 @@ def receive_data_pickle(conn: socket):
     """
     receive a data with header
     :param conn: socket
-    :return: unpickle object
+    :return: unpickle object (MessageType Enum, DATA)
     """
     msg_length = conn.recv(HEADER).decode(FORMAT)  # get the length of the incoming msg
     if msg_length:

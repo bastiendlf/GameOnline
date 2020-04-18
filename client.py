@@ -28,7 +28,6 @@ def main(username: str):
         turn = client.send((MessageType.WHOSE_TURN, ""))
 
         if turn[0] == MessageType.END_GAME:
-            startGame = False
             break
         elif turn[0] == MessageType.WHOSE_TURN:
             if turn[1] == username:  # my turn

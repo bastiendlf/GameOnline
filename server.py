@@ -18,8 +18,8 @@ def find_lobby(client_id: int, username: str):
     """
 
     global lobbies
-
     lobbyFound = False
+    new_lobby = set()
 
     for lobby in lobbies:
         if not lobby.is_full():
@@ -36,103 +36,6 @@ def find_lobby(client_id: int, username: str):
         lobbies.append(new_lobby)
 
     return new_lobby
-
-
-def threaded_client(conn: socket, address: tuple, _clientID: int):
-    """
-    runs a new thread for each player connected to server
-
-    :param conn: new client's socket object
-    :param address: client's address (ip, port)
-    :param _clientID: client id (int)
-    :return: None
-    """
-
-    global connections, lobbies
-    current_id = _clientID
-    connected = True
-
-    username = str(receive_data_pickle(conn))
-    print(f"[SERVER] {str(address[0])} connected, username {username}.")
-    lobby = find_lobby(current_id, username)
-    lobbyID = lobby.lobbyID
-
-    opponent = tuple()
-
-    for lobby in lobbies:
-        print(f"Lobby {lobby.lobbyID} active, players connected : {str(lobby.all_players)}.")
-    send_data_pickle(conn, (current_id, lobbyID))
-
-    while connected:
-        data = receive_data_pickle(conn)
-
-        if data[0] == MessageType.SEND_MY_GRID:
-            print(f"[LOBBY] {username} sends its grid.")
-            lobby.add_grid_player(current_id, data[1])
-            send_data_pickle(conn, (MessageType.REPLY_ACK, "[SERVER] Grid received."))
-            print(lobby.all_grids[str(current_id)])
-
-            # Wait for other player
-            send_start = False
-            while not send_start:
-                if lobby.start:
-                    send_start = True
-            send_data_pickle(conn, (MessageType.START_PLAY, ""))
-            opponent = get_opponent(username, lobby)
-
-        if data[0] == MessageType.SEND_MY_GUESSED:
-            guessed = data[1]
-            print(f"[{username} sends its guessed grid")
-            touched, guessed, lobby.all_grids[str(opponent[0])] = check_attack_result(guessed,
-                                                                                      lobby.all_grids[str(opponent[0])])
-            if not touched:
-                lobby.change_turn()
-            send_data_pickle(conn, (MessageType.SEND_MY_GUESSED, guessed))
-            lobby.end_turn = True
-
-        if data[0] == MessageType.UPDATED_GRID:
-            ready = False
-            while ready:
-                if lobby.end_turn:  # wait for opponent to play
-                    ready = False
-                    break
-            lobby.end_turn = False
-            send_data_pickle(conn, (MessageType.UPDATED_GRID, lobby.all_grids[str(current_id)]))
-
-        if data[0] == MessageType.WHOSE_TURN:
-            send_data_pickle(conn, (MessageType.WHOSE_TURN, lobby.current_turn))
-
-        if data[0] == MessageType.DISCONNECT:
-            connected = False
-            lobby.remove_player(current_id, username)
-
-    # When user disconnects
-    print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected.")
-    connections -= 1
-    conn.close()
-
-
-def start():
-    server.listen()
-    print(f"[LISTENING] Server is now listening.")
-    global _idCount, lobbies, connections
-
-    while True:
-        conn, address = server.accept()  # wait for a new client to connect
-
-        # lobbyID = (_idCount - 1) // 2
-        # if _idCount % 2 == 1:  # create a new lobby every 2 players
-        #     lobbies[lobbyID] = Lobby(lobbyID, MAX_PLAYERS_LOBBY)
-        #     print(f"[LOBBY] Creating a new lobby with id : {lobbyID}")
-
-        connections += 1
-
-        print(f"[ACTIVE CONNECTIONS] {connections}.")
-
-        # Start a new thread for each client
-        thread = threading.Thread(target=threaded_client, args=(conn, address, _idCount))
-        thread.start()
-        _idCount += 1
 
 
 def get_opponent(my_username: str, lobby: Lobby):
@@ -169,6 +72,97 @@ def check_attack_result(my_guessed: np.ndarray, opponent_grid: np.ndarray):
     return touched, my_guessed, opponent_grid
 
 
+def threaded_client(conn: socket, address: tuple, _client_id: int):
+    """
+    runs a new thread for each player connected to server
+
+    :param conn: new client's socket object
+    :param address: client's address (ip, port)
+    :param _client_id: client id (int)
+    :return: None
+    """
+
+    global connections, lobbies
+    current_id = _client_id
+    connected = True
+
+    username = str(receive_data_pickle(conn)[1])
+    print(f"[SERVER] {str(address[0])} connected, username {username}.")
+    lobby = find_lobby(current_id, username)
+    lobbyID = lobby.lobbyID
+
+    opponent = tuple()
+
+    for lobby in lobbies:
+        print(f"[SERVER] Lobby {lobby.lobbyID} active, players connected : {str(lobby.all_players)}.")
+
+    send_data_pickle(conn, (MessageType.REPLY_ACK, (current_id, lobbyID)))
+
+    while connected:
+        data = receive_data_pickle(conn)
+
+        if data[0] == MessageType.SEND_MY_GRID:
+            print(f"[LOBBY {lobbyID}] {username} sends its grid.")
+            lobby.add_grid_player(current_id, data[1])
+            send_data_pickle(conn, (MessageType.REPLY_ACK, "[SERVER] Grid received."))
+
+            # Wait for other player
+            send_start = False
+            while not send_start:
+                if lobby.start:
+                    send_start = True
+            send_data_pickle(conn, (MessageType.START_PLAY, ""))
+            opponent = get_opponent(username, lobby)
+
+        if data[0] == MessageType.SEND_MY_GUESSED:
+            guessed = data[1]
+            print(f"[LOBBY {lobbyID}] {username} sends its guessed grid.")
+            touched, guessed, lobby.all_grids[str(opponent[0])] = check_attack_result(guessed,
+                                                                                      lobby.all_grids[str(opponent[0])])
+            if not touched:
+                lobby.change_turn()
+            send_data_pickle(conn, (MessageType.SEND_MY_GUESSED, guessed))
+            lobby.end_turn = True
+
+        if data[0] == MessageType.UPDATED_GRID:
+            ready = False
+            while ready:
+                if lobby.end_turn:  # wait for opponent to play
+                    break
+            lobby.end_turn = False
+            send_data_pickle(conn, (MessageType.UPDATED_GRID, lobby.all_grids[str(current_id)]))
+
+        if data[0] == MessageType.WHOSE_TURN:
+            send_data_pickle(conn, (MessageType.WHOSE_TURN, lobby.current_turn))
+
+        if data[0] == MessageType.DISCONNECT:
+            connected = False
+            lobby.remove_player(current_id, username)
+
+    # When user disconnects
+    print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected.")
+    connections -= 1
+    conn.close()
+
+
+def start():
+    server.listen()
+    print(f"[SERVER] Server is now listening.")
+    global _idCount, lobbies, connections
+
+    while True:
+        conn, address = server.accept()  # wait for a new client to connect
+
+        connections += 1
+
+        print(f"[SERVER] Active connections : {connections}.")
+
+        # Start a new thread for each client
+        thread = threading.Thread(target=threaded_client, args=(conn, address, _idCount))
+        thread.start()
+        _idCount += 1
+
+
 if __name__ == "__main__":
 
     connections = 0
@@ -179,7 +173,7 @@ if __name__ == "__main__":
 
     try:
         server.bind(ADDRESS_SERVER)
-        print(f"[STARTING] Server is starting with ip {SERVER_IP}.")
+        print(f"[SERVER] Server is starting with ip {SERVER_IP}.")
         start()
         print("[SERVER] Server offline.")
 
