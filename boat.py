@@ -1,13 +1,5 @@
-from game_data import BoatType, Orientation, BoatCellState
-
-
-class ShipCell:
-    def __init__(self, pos: tuple):
-        self.pos = pos
-        self.state = BoatCellState.safe
-
-    def __str__(self):
-        return str(f"({self.pos[0]}, {self.pos[1]}) : {self.state}")
+from game_data import BoatType, Orientation
+from gridcell import *
 
 
 class Boat:

@@ -125,8 +125,7 @@ def threaded_client(conn: socket, address: tuple, _client_id: int):
             lobby.end_turn = True
 
         if data[0] == MessageType.UPDATED_GRID:
-            ready = False
-            while ready:
+            while True:
                 if lobby.end_turn:  # wait for opponent to play
                     break
             lobby.end_turn = False

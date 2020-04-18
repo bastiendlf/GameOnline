@@ -6,9 +6,11 @@ with contextlib.redirect_stdout(None):
 from enum import Enum, IntEnum
 
 # constants
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 GRID_SIZE = (10, 10)
+
+CELL_SIZE = (30, 30)
 
 
 # Boats type

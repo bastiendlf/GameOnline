@@ -1,5 +1,7 @@
 import numpy as np
 
+from game_data import GridCellType
+
 
 class Lobby:
     def __init__(self, _lobby_id: int, max_players: int = 2):
@@ -56,3 +58,16 @@ class Lobby:
         """
         self.all_players.remove((player_id, username))
         del self.all_grids[str(player_id)]
+
+    def end_game(self):
+
+        for grid in self.all_grids:
+            no_boat = True
+            for j in grid.shape[0]:
+                for i in grid.shape[1]:
+                    if grid[j][i] == GridCellType.boat:
+                        no_boat = False
+            if no_boat:
+                return True
+
+        return False
