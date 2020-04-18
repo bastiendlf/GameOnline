@@ -138,6 +138,12 @@ def threaded_client(conn: socket, address: tuple, _client_id: int):
             connected = False
             lobby.remove_player(current_id, username)
 
+        if lobby.end_game():
+            print("End Game")
+            send_data_pickle(conn, (MessageType.DISCONNECT, ""))
+            lobby.remove_player(current_id, username)
+            break
+
     # When user disconnects
     print(f"[DISCONNECT] Name:{username} ({str(address[0])}), Client Id: {current_id} -> disconnected.")
     connections -= 1

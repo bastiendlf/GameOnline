@@ -58,16 +58,21 @@ class Lobby:
         """
         self.all_players.remove((player_id, username))
         del self.all_grids[str(player_id)]
+        self.reset_game()
 
     def end_game(self):
 
-        for grid in self.all_grids:
+        for grid in self.all_grids.values():
             no_boat = True
-            for j in grid.shape[0]:
-                for i in grid.shape[1]:
+            for j in range(grid.shape[0]):
+                for i in range(grid.shape[1]):
                     if grid[j][i] == GridCellType.boat:
                         no_boat = False
             if no_boat:
                 return True
 
         return False
+
+    def reset_game(self):
+        self.start = False
+        self.end_turn = False

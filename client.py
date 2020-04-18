@@ -16,7 +16,7 @@ def main(username: str):
     my_game = Game()
     print("This is your grid : ")
     print(my_game.my_grid)
-    place_boats_old(my_game)
+    place_boats(my_game)
 
     print(client.send((MessageType.SEND_MY_GRID, my_game.my_grid))[1])
     print("Waiting for your opponent...")
@@ -55,6 +55,9 @@ def main(username: str):
                 if answer[0] == MessageType.UPDATED_GRID:
                     my_game.my_grid = answer[1]
                 print_grids(my_game)
+        else:
+            print("End game, thanks for playing.")
+            break
 
     client.send((MessageType.DISCONNECT,))
     pygame.quit()
@@ -63,11 +66,11 @@ def main(username: str):
 
 def place_boats_old(game: Game):
     game.place_one_boat(BoatType.aircraft_carrier, (1, 1), Orientation.vertical)
-    game.place_one_boat(BoatType.cruiser, (1, 9), Orientation.horizontal)
-    game.place_one_boat(BoatType.torpedo_boat, (4, 4), Orientation.vertical)
-    game.place_one_boat(BoatType.destroyer, (6, 1), Orientation.horizontal)
-    game.place_one_boat(BoatType.destroyer, (6, 8), Orientation.vertical)
-    game.place_one_boat(BoatType.destroyer, (8, 6), Orientation.vertical)
+    # game.place_one_boat(BoatType.cruiser, (1, 9), Orientation.horizontal)
+    # game.place_one_boat(BoatType.torpedo_boat, (4, 4), Orientation.vertical)
+    # game.place_one_boat(BoatType.destroyer, (6, 1), Orientation.horizontal)
+    # game.place_one_boat(BoatType.destroyer, (6, 8), Orientation.vertical)
+    # game.place_one_boat(BoatType.destroyer, (8, 6), Orientation.vertical)
 
 
 def place_boats(game: Game):
